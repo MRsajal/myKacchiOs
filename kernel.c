@@ -46,6 +46,12 @@ void null_process(void){
     
 }
 
+void procA(void){
+    serial_puts("Process A is running.\n");
+}
+void procB(void){
+    serial_puts("Process B is running.\n");
+}
 void kmain(void) {
     
     
@@ -60,6 +66,8 @@ void kmain(void) {
     serial_puts("Hello from kacchiOS!\n");
     serial_puts("Initializing null process...\n\n");
     proc_init();
+    proc_create(procA);
+    proc_create(procB);
     serial_puts("Starting null process...\n");
     proc_create(null_process);
     proc_run();
