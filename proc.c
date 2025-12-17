@@ -16,7 +16,7 @@ void proc_init(void){
 }
 
 // Create a new process
-int proc_create(void (*func)(void)){
+int* proc_create(void (*func)(void)){
     if (next_pid >= MAX_PROCS){
         return -1;
     }

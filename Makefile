@@ -32,6 +32,10 @@ debug: kernel.elf
 	@echo "Waiting for GDB connection on port 1234..."
 	@echo "In another terminal run: gdb -ex 'target remote localhost:1234' -ex 'symbol-file kernel.elf'"
 
+proc.o: proc.c proc.h
+	gcc -m32 -ffreestanding -O2 -Wall -Wextra -nostdinc \
+	    -fno-builtin -fno-stack-protector -I. -c proc.c -o proc.o
+
 clean:
 	rm -f *.o kernel.elf
 
