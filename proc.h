@@ -21,7 +21,7 @@ typedef struct process
 } pcb_t;
 
 void proc_init(void);
-int *proc_create(void (*func)(void));
+int proc_create(void (*func)(void));
 void proc_run(void);
 void proc_exit(void);
 
