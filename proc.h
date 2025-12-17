@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-#define MAX_PROCS 8
+#define MAX_PROCS 100
 
 typedef enum
 {
@@ -21,7 +21,7 @@ typedef struct process
 } pcb_t;
 
 void proc_init(void);
-int proc_create(void (*func)(void));
+int32_t proc_create(void (*func)(void));
 void proc_run(void);
 void proc_exit(void);
 

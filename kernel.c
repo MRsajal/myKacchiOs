@@ -64,10 +64,10 @@ void kmain(void) {
     serial_puts("    kacchiOS - Minimal Baremetal OS\n");
     serial_puts("========================================\n");
     serial_puts("Hello from kacchiOS!\n");
-    serial_puts("Initializing null process...\n\n");
     proc_init();
     proc_create(procA);
     proc_create(procB);
+    serial_puts("Initializing null process...\n\n");
     serial_puts("Starting null process...\n");
     proc_create(null_process);
     proc_run();

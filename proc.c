@@ -2,12 +2,12 @@
 #include "serial.h"
 
 static pcb_t proctab[MAX_PROCS];
-static int current_pid = -1;
-static int next_pid = 0;
+static int32_t current_pid = -1;
+static int32_t next_pid = 0;
 
-static void serial_put_int(int num){
-    char buf[12];
-    int i=0;
+static void serial_put_int(int32_t num){
+    int8_t buf[12];
+    int32_t i=0;
 
     if (num==0){
         serial_putc('0');
@@ -33,11 +33,11 @@ void proc_init(void){
 }
 
 // Create a new process
-int proc_create(void (*func)(void)){
+int32_t proc_create(void (*func)(void)){
     if (next_pid >= MAX_PROCS){
         return -1;
     }
-    int pid=next_pid++;
+    int32_t pid=next_pid++;
 
     proctab[pid].pid = pid;
     proctab[pid].state = PR_READY;
@@ -51,7 +51,7 @@ int proc_create(void (*func)(void)){
 }
 
 void proc_run(void){
-    for (int i=0;i<MAX_PROCS;i++){
+    for (int32_t i=0;i<MAX_PROCS;i++){
         if (proctab[i].state == PR_READY){
             current_pid = i;
             proctab[i].state = PR_CURRENT;
