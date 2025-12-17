@@ -5,6 +5,23 @@ static pcb_t proctab[MAX_PROCS];
 static int current_pid = -1;
 static int next_pid = 0;
 
+static void serial_put_int(int num){
+    char buf[12];
+    int i=0;
+
+    if (num==0){
+        serial_putc('0');
+        return;
+    }
+    while(num>0){
+        buf[i++]=(num%10)+'0';
+        num/=10;
+    }
+    while(i--){
+        serial_putc(buf[i]);
+    }
+}
+
 // Initialize the process manager
 void proc_init(void){
     for (int i=0;i<MAX_PROCS;i++){
@@ -27,9 +44,7 @@ int proc_create(void (*func)(void)){
     proctab[pid].entry = func;
 
     serial_puts("Process created with PID: ");
-    char pid_str[4];
-    itoa(pid, pid_str, 10);
-    serial_puts(pid_str);
+    serial_put_int(pid);
     serial_puts("\n");
 
     return pid;
@@ -42,9 +57,7 @@ void proc_run(void){
             proctab[i].state = PR_CURRENT;
 
             serial_puts("Running process PID: ");
-            char pid_str[4];
-            itoa(i, pid_str, 10);
-            serial_puts(pid_str);
+            serial_put_int(i);
             serial_puts("\n");
 
             proctab[i].entry();
@@ -58,9 +71,7 @@ void proc_exit(void){
         return;
     }
     serial_puts("Terminating process PID: ");
-    char pid_str[4];
-    itoa(current_pid, pid_str, 10);
-    serial_puts(pid_str);
+    serial_put_int(current_pid);
     serial_puts("\n");
 
     proctab[current_pid].state = PR_TERMINATED;
