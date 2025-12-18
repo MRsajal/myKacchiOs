@@ -49,9 +49,11 @@ void null_process(void){
 
 void procA(void){
     serial_puts("Process A is running.\n");
+    yield();
 }
 void procB(void){
     serial_puts("Process B is running.\n");
+    yield();
 }
 void kmain(void) {
     

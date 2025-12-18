@@ -17,6 +17,8 @@ typedef struct process
     int pid;
     proc_state_t state;
     void (*entry)(void);
+    uint32_t* stack_base;
+    uint32_t* esp;
     void* mem;
     size_t memsz;
 
