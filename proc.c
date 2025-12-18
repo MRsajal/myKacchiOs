@@ -36,14 +36,24 @@ void proc_init(void){
     for (int i=0;i<MAX_PROCS;i++){
         proctab[i].pid = -1;
         proctab[i].state = PR_TERMINATED;
-        proctab[i].entry = 0;
+        proctab[i].entry = NULL;
+        proctab[i].stack_base = NULL;
+        proctab[i].esp = NULL;
+        proctab[i].mem = NULL;
+        proctab[i].memsz = 0;
     }
     serial_puts("Process manager initialized.\n");
 }
 
 // Create a new process
 int32_t proc_create(void (*func)(void)){
-    if (next_pid >= MAX_PROCS){
+    int pid;
+    for(pid=0;pid<MAX_PROCS;pid++){
+        if(proctab[pid].state == PR_TERMINATED){
+            break;
+        }
+    }
+    if(pid==MAX_PROCS){
         return -1;
     }
 
@@ -62,7 +72,7 @@ int32_t proc_create(void (*func)(void)){
     *--sp=0;
     *--sp=0;
 
-    int pid = next_pid++;
+    //int pid = next_pid++;
 
     proctab[pid].pid = pid;
     proctab[pid].state = PR_READY;
@@ -72,20 +82,6 @@ int32_t proc_create(void (*func)(void)){
     proctab[pid].mem = stack;
     proctab[pid].memsz = PROC_STACK_SIZE;
 
-    // void* mem = mem_alloc(PROC_MEM_SIZE);
-    // if(!mem){
-    //     serial_puts("Memory allocation failed for new process.\n");
-    //     return -1;
-    // }
-
-    // int32_t pid=next_pid++;
-
-    // proctab[pid].pid = pid;
-    // proctab[pid].state = PR_READY;
-    // proctab[pid].entry = func;
-    // proctab[pid].mem=mem;
-    // proctab[pid].memsz=PROC_MEM_SIZE;
-
     serial_puts("Process created with PID: ");
     serial_put_int(pid);
     serial_puts("\n");
@@ -94,46 +90,59 @@ int32_t proc_create(void (*func)(void)){
 }
 
 void proc_run(void){
-    // for (int32_t i=0;i<MAX_PROCS;i++){
-    //     if (proctab[i].state == PR_READY){
-    //         current_pid = i;
-    //         proctab[i].state = PR_CURRENT;
-
-    //         serial_puts("Running process PID: ");
-    //         serial_put_int(i);
-    //         serial_puts("\n");
-
-    //         proctab[i].entry();
-    //         proc_exit();
-    //     }
-    // }
-    currpid=&proctab[0];
-    currpid->state=PR_CURRENT;
-
-    currpid->entry();
+    current_pid= -1;
+    resched();
 }
+// void resched(void){
+//     int next = -1;
+//     for(int i=0;i<MAX_PROCS;i++){
+//         if(proctab[i].state == PR_READY){
+//             next = i;
+//             break;
+//         }
+//     }
+//     if(next == -1 || next == current_pid){
+//         return;
+//     }
+//     int old=current_pid;
+//     current_pid=next;
+    
+//     proctab[next].state=PR_CURRENT;
+
+//     if(old >=0 && proctab[old].state == PR_CURRENT){
+//         proctab[old].state=PR_READY;
+//     }
+//     if(old<0){
+//         asm volatile("movl %0, %%esp"::"r"(proctab[next].esp));
+//         return;
+//     }
+//     ctxsw(&proctab[old].esp,&proctab[next].esp);
+// }
+
 void resched(void){
-    int next = -1;
-    for(int i=0;i<MAX_PROCS;i++){
-        if(proctab[i].state == PR_READY){
-            next = i;
+    int next=-1;
+    for(int i=1;i<=MAX_PROCS;i++){
+        int pid=(current_pid + i)%MAX_PROCS;
+        if(proctab[pid].state==PR_READY){
+            next=pid;
             break;
         }
     }
-    if(next == -1 || next == current_pid){
+    if(next==-1 || next==current_pid){
         return;
     }
     int old=current_pid;
     current_pid=next;
-    
+    currpid=&proctab[next];
     proctab[next].state=PR_CURRENT;
 
-    if(old >=0 && proctab[old].state == PR_CURRENT){
+    if(old>=0 && proctab[old].state==PR_CURRENT){
         proctab[old].state=PR_READY;
     }
+
     if(old<0){
         asm volatile("movl %0, %%esp"::"r"(proctab[next].esp));
-        return;
+        asm volatile("ret");
     }
     ctxsw(&proctab[old].esp,&proctab[next].esp);
 }
@@ -150,6 +159,12 @@ void proc_exit(void){
     mem_free(proctab[pid].mem);
     proctab[pid].mem = NULL;
 
+    serial_puts("Process exited: ");
+    serial_put_int(pid);
+    serial_puts("\n");
+
+    currpid = NULL;
+    current_pid = -1;
     resched();
 
     while (1); /* never returns */
