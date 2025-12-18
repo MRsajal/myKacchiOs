@@ -36,6 +36,9 @@ proc.o: proc.c proc.h
 	gcc -m32 -ffreestanding -O2 -Wall -Wextra -nostdinc \
 	    -fno-builtin -fno-stack-protector -I. -c proc.c -o proc.o
 
+ctxsw.o: ctxsw.S
+	as --32 ctxsw.S -o ctxsw.o
+
 clean:
 	rm -f *.o kernel.elf
 

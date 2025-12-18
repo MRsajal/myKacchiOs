@@ -28,5 +28,7 @@ void proc_init(void);
 int32_t proc_create(void (*func)(void));
 void proc_run(void);
 void proc_exit(void);
+void resched(void);
+void yield(void);
 
 #endif
