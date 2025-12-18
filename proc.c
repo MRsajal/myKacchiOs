@@ -8,6 +8,7 @@
 static pcb_t proctab[MAX_PROCS];
 static int32_t current_pid = -1;
 static int32_t next_pid = 0;
+pcb_t* currpid=NULL;
 
 extern void proc_exit(void);
 extern void ctxsw(uint32_t** old, uint32_t** new);
@@ -106,7 +107,10 @@ void proc_run(void){
     //         proc_exit();
     //     }
     // }
-    resched();
+    currpid=&proctab[0];
+    currpid->state=PR_CURRENT;
+
+    currpid->entry();
 }
 void resched(void){
     int next = -1;
@@ -135,11 +139,12 @@ void resched(void){
 }
 
 void yield(void){
+    currpid->state=PR_READY;
     resched();
 }
 
 void proc_exit(void){
-    int pid = current_pid;
+    int pid = currpid->pid;
 
     proctab[pid].state = PR_TERMINATED;
     mem_free(proctab[pid].mem);
