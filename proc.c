@@ -136,10 +136,16 @@ void resched(void){
         proctab[old].state=PR_READY;
     }
 
-    if(old<0){
-        asm volatile("movl %0, %%esp"::"r"(proctab[next].esp));
-        asm volatile("ret");
+    if (old < 0){
+        asm volatile(
+            "movl %0, %%esp \n"
+            "jmp *%1       \n"
+            :
+            : "r"(proctab[next].esp),
+            "r"(proctab[next].entry)
+        );
     }
+
     ctxsw(&proctab[old].esp,&proctab[next].esp);
 }
 
