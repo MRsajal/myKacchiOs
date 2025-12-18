@@ -68,10 +68,9 @@ void kmain(void) {
     serial_puts("========================================\n");
     serial_puts("Hello from kacchiOS!\n");
     proc_init();
-    proc_create(null_process);  // PID 0
     proc_create(procA);         // PID 1
     proc_create(procB);         // PID 2
-
+    proc_create(null_process);  // PID 0
     proc_run();
 
     /* Should never reach here */
