@@ -7,7 +7,6 @@
 
 static pcb_t proctab[MAX_PROCS];
 static int32_t current_pid = -1;
-static int32_t next_pid = 0;
 pcb_t* currpid=NULL;
 
 extern void proc_exit(void);
@@ -65,12 +64,9 @@ int32_t proc_create(void (*func)(void)){
 
     uint32_t* sp = (uint32_t*)((uint8_t*)stack + PROC_STACK_SIZE);
 
-    *--sp = (uint32_t)proc_exit; // Return address
-    *--sp = (uint32_t)func;      // Initial EIP
-    *--sp=0;
-    *--sp=0;
-    *--sp=0;
-    *--sp=0;
+    *--sp = (uint32_t)proc_exit; /* return address after func */
+    *--sp = (uint32_t)func;      /* EIP target for first ret */
+
 
     //int pid = next_pid++;
 
