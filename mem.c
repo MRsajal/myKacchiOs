@@ -26,6 +26,7 @@ void mem_init(void){
 // Allocate memory
 void *mem_alloc(size_t size){
     mem_block_t *curr = free_list;
+    size = (size + 3) & ~3; // Align size to 4 bytes
     while (curr)
     {
         if(curr->free && curr->size >=size){
@@ -41,6 +42,7 @@ void *mem_alloc(size_t size){
             curr->free = 0;
             return (uint8_t*)curr + sizeof(mem_block_t);
         }
+        curr=curr->next;
     }
     return NULL;
 }

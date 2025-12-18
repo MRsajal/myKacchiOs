@@ -3,7 +3,7 @@
 #include "mem.h"
 
 #define PROC_MEM_SIZE 1024
-#define PROC_STACK_SIZE 1024
+#define PROC_STACK_SIZE 4096
 
 static pcb_t proctab[MAX_PROCS];
 static int32_t current_pid = -1;
@@ -46,56 +46,43 @@ void proc_init(void){
 
 // Create a new process
 int32_t proc_create(void (*func)(void)){
-    // int pid;
-    // for(pid=0;pid<MAX_PROCS;pid++){
-    //     if(proctab[pid].state == PR_TERMINATED){
-    //         break;
-    //     }
-    // }
-    // if(pid==MAX_PROCS){
-    //     return -1;
-    // }
-
-    // uint32_t* stack=mem_alloc(PROC_STACK_SIZE);
-    // if(!stack){
-    //     serial_puts("Stack allocation failed for new process.\n");
-    //     return -1;
-    // }
-
-    // uint32_t* sp = (uint32_t*)((uint8_t*)stack + PROC_STACK_SIZE);
-
-    // *--sp = (uint32_t)proc_exit; /* return address after func */
-    // *--sp = (uint32_t)func;      /* EIP target for first ret */
-
-
-    // //int pid = next_pid++;
-
-    // proctab[pid].pid = pid;
-    // proctab[pid].state = PR_READY;
-    // proctab[pid].entry = func;
-    // proctab[pid].stack_base = stack;
-    // proctab[pid].esp = sp;
-    // proctab[pid].mem = stack;
-    // proctab[pid].memsz = PROC_STACK_SIZE;
-
-    // serial_puts("Process created with PID: ");
-    // serial_put_int(pid);
-    // serial_puts("\n");
-
-    // return pid;
-    serial_puts("ENTER proc_create\n");
-
-    uint32_t* stack = mem_alloc(PROC_STACK_SIZE);
-
-    serial_puts("AFTER mem_alloc\n");
-
-    if(!stack){
-        serial_puts("Stack allocation failed.\n");
+    int pid;
+    for(pid=0;pid<MAX_PROCS;pid++){
+        if(proctab[pid].state == PR_TERMINATED){
+            break;
+        }
+    }
+    if(pid==MAX_PROCS){
         return -1;
     }
 
-    serial_puts("STACK OK\n");
-    return 0;
+    uint32_t* stack=mem_alloc(PROC_STACK_SIZE);
+    if(!stack){
+        serial_puts("Stack allocation failed for new process.\n");
+        return -1;
+    }
+
+    uint32_t* sp = (uint32_t*)(((uint32_t)stack + PROC_STACK_SIZE) & ~0xF);
+
+    *--sp = (uint32_t)proc_exit; /* return address after func */
+    *--sp = (uint32_t)func;      /* EIP target for first ret */
+
+
+    //int pid = next_pid++;
+
+    proctab[pid].pid = pid;
+    proctab[pid].state = PR_READY;
+    proctab[pid].entry = func;
+    proctab[pid].stack_base = stack;
+    proctab[pid].esp = sp;
+    proctab[pid].mem = stack;
+    proctab[pid].memsz = PROC_STACK_SIZE;
+
+    serial_puts("Process created with PID: ");
+    serial_put_int(pid);
+    serial_puts("\n");
+
+    return pid;
 }
 
 void proc_run(void){
