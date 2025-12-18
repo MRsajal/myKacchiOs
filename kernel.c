@@ -3,6 +3,7 @@
 #include "serial.h"
 #include "string.h"
 #include "proc.h"
+#include "mem.h"
 
 #define MAX_INPUT 128
 
@@ -57,7 +58,7 @@ void kmain(void) {
     
     /* Initialize hardware */
     serial_init();
-    
+    mem_init();
     /* Print welcome message */
     serial_puts("\n");
     serial_puts("========================================\n");
