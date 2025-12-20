@@ -34,7 +34,7 @@ debug: kernel.elf
 
 process.o: process.c process.h
 	gcc -m32 -ffreestanding -O2 -Wall -Wextra -nostdinc \
-	    -fno-builtin -fno-stack-protector -I. -c proc.c -o proc.o
+	    -fno-builtin -fno-stack-protector -I. -c process.c -o process.o
 
 ctxsw.o: ctxsw.S
 	as --32 ctxsw.S -o ctxsw.o
