@@ -49,13 +49,18 @@ void null_process(void){
 }
 
 void procA(void){
-    serial_puts("Process A is running.\n");
-    sched_yield();
+    while(1){
+        serial_puts("Process A is running.\n");
+        sched_yield();
+    }
 }
 void procB(void){
-    serial_puts("Process B is running.\n");
-    sched_yield();
+    while(1){
+        serial_puts("Process B is running.\n");
+        sched_yield();
+    }
 }
+
 void kmain(void) {
     
     
@@ -69,9 +74,9 @@ void kmain(void) {
     serial_puts("========================================\n");
     serial_puts("Hello from kacchiOS!\n");
     proc_init();
+    proc_create(null_process);  // PID 0
     proc_create(procA);         // PID 1
     proc_create(procB);         // PID 2
-    proc_create(null_process);  // PID 0
     proc_run();
 
     /* Should never reach here */
