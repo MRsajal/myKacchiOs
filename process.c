@@ -1,6 +1,6 @@
-#include "proc.h"
+#include "process.h"
 #include "serial.h"
-#include "mem.h"
+#include "memory.h"
 
 #define PROC_MEM_SIZE 1024
 #define PROC_STACK_SIZE 4096

@@ -2,8 +2,9 @@
 #include "types.h"
 #include "serial.h"
 #include "string.h"
-#include "proc.h"
-#include "mem.h"
+#include "process.h"
+#include "memory.h"
+#include "scheduler.h"
 
 #define MAX_INPUT 128
 
@@ -49,11 +50,11 @@ void null_process(void){
 
 void procA(void){
     serial_puts("Process A is running.\n");
-    yield();
+    sched_yield();
 }
 void procB(void){
     serial_puts("Process B is running.\n");
-    yield();
+    sched_yield();
 }
 void kmain(void) {
     

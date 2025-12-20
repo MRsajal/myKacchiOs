@@ -1,5 +1,5 @@
-#ifndef _PROC_H_
-#define _PROC_H_
+#ifndef _PROCESS_H_
+#define _PROCESS_H_
 
 #include "types.h"
 
@@ -17,9 +17,9 @@ typedef struct process
     int pid;
     proc_state_t state;
     void (*entry)(void);
-    uint32_t* stack_base;
-    uint32_t* esp;
-    void* mem;
+    uint32_t *stack_base;
+    uint32_t *esp;
+    void *mem;
     size_t memsz;
 
 } pcb_t;

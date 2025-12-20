@@ -8,7 +8,7 @@ CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra -nostdinc \
 ASFLAGS = --32
 LDFLAGS = -m elf_i386
 
-OBJS = boot.o kernel.o serial.o string.o proc.o mem.o ctxsw.o
+OBJS = boot.o kernel.o serial.o string.o process.o memory.o ctxsw.o
 
 all: kernel.elf
 
@@ -32,7 +32,7 @@ debug: kernel.elf
 	@echo "Waiting for GDB connection on port 1234..."
 	@echo "In another terminal run: gdb -ex 'target remote localhost:1234' -ex 'symbol-file kernel.elf'"
 
-proc.o: proc.c proc.h
+process.o: process.c process.h
 	gcc -m32 -ffreestanding -O2 -Wall -Wextra -nostdinc \
 	    -fno-builtin -fno-stack-protector -I. -c proc.c -o proc.o
 
