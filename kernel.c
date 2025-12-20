@@ -7,7 +7,7 @@
 #include "scheduler.h"
 
 #define MAX_INPUT 128
-
+static int user_pid=1;
 void null_process(void){
     char input[MAX_INPUT];
     int pos;
@@ -61,6 +61,14 @@ void procB(void){
     }
 }
 
+void userProcess(void){
+    // serial_puts("User process started.\n");
+    while(1){
+        serial_printf("User process %d is running.\n", user_pid);
+        sched_yield();
+    }
+}
+
 void kmain(void) {
     
     
@@ -75,8 +83,16 @@ void kmain(void) {
     serial_puts("Hello from kacchiOS!\n");
     proc_init();
     proc_create(null_process);  // PID 0
-    proc_create(procA);         // PID 1
-    proc_create(procB);         // PID 2
+    // proc_create(procA);         // PID 1
+    // proc_create(procB);         // PID 2
+    while(1){
+        proc_create((void(*)(void))userProcess);
+        user_pid++;
+        if(user_pid>5) {
+            user_pid=1;
+            break;
+        }
+    }
     proc_run();
 
     /* Should never reach here */
