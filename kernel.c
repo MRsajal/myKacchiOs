@@ -48,6 +48,41 @@ void null_process(void){
     
 }
 
+void int_to_string(int32_t value, char *str) {
+    int i = 0;
+    int is_negative = 0;
+
+    if (value == 0) {
+        str[i++] = '0';
+        str[i] = '\0';
+        return;
+    }
+
+    if (value < 0) {
+        is_negative = 1;
+        value = -value;
+    }
+
+    while (value != 0) {
+        str[i++] = (value % 10) + '0';
+        value /= 10;
+    }
+
+    if (is_negative) {
+        str[i++] = '-';
+    }
+
+    str[i] = '\0';
+
+    /* Reverse string */
+    for (int j = 0, k = i - 1; j < k; j++, k--) {
+        char temp = str[j];
+        str[j] = str[k];
+        str[k] = temp;
+    }
+}
+
+
 void procA(void){
     while(1){
         serial_puts("Process A is running.\n");
@@ -63,8 +98,12 @@ void procB(void){
 
 void userProcess(void){
     // serial_puts("User process started.\n");
+    char pid_str[12];
     while(1){
-        serial_printf("User process %d is running.\n", user_pid);
+        int_to_string(user_pid, pid_str);
+        serial_puts("User Process ");
+        serial_puts(pid_str);
+        serial_puts(" is running.\n");
         sched_yield();
     }
 }
