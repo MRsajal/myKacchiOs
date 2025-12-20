@@ -1,4 +1,4 @@
-#include "mem.h"
+#include "memory.h"
 #include "serial.h"
 
 #define HEAP_SIZE 64*1024  // 64 KB heap size
