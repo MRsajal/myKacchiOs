@@ -135,8 +135,6 @@ void userProcess(void){
         serial_puts("User Process ");
         serial_puts(pid_str);
         serial_puts(" is running.\n");
-        for(volatile int i=0;i<100;i++); // Very short delay for quick context switching
-        proc_list();
         sched_yield();
     }
 }
