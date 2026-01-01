@@ -59,7 +59,7 @@ void null_process(void){
         }
         else if(strcmp(input,"psa")==0){
             serial_puts("Current running processes:\n");
-            proc_list();
+            //proc_list();
         }
         else if(pos>0){
             serial_puts("Unknown command: ");
@@ -76,6 +76,8 @@ void null_process(void){
     }
     
 }
+
+
 
 void int_to_string(int32_t value, char *str) {
     int i = 0;
