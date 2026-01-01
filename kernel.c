@@ -130,9 +130,12 @@ void procB(void){
 void userProcess(void){
     char pid_str[12];
     int counter = 0;
-    while(1){
+
+    serial_puts("[User Task Started]\n");
+
+    while(counter < 10000) {          // Run fixed work then stop
         counter++;
-        // Only print every 1000th iteration to reduce output overhead
+
         if(counter % 1000 == 0) {
             int_to_string(user_pid, pid_str);
             serial_puts("User Process ");
@@ -142,9 +145,14 @@ void userProcess(void){
             serial_puts(pid_str);
             serial_puts("k)\n");
         }
+
         sched_yield();
     }
+
+    serial_puts("[User Task Finished]\n");
+    proc_exit();   // 🔥 MUST add this → removes PCB + returns to null
 }
+
 
 void kmain(void) {
     
