@@ -59,7 +59,7 @@ void null_process(void){
         }
         else if(strcmp(input,"psa")==0){
             serial_puts("Current running processes:\n");
-            //proc_list();
+            proc_list();
         }
         else if(pos>0){
             serial_puts("Unknown command: ");
@@ -135,7 +135,7 @@ void userProcess(void){
         serial_puts("User Process ");
         serial_puts(pid_str);
         serial_puts(" is running.\n");
-        for(volatile int i=0;i<1000000;i++); // Simple delay
+        for(volatile int i=0;i<10000;i++); // Reduced delay for faster context switching
         sched_yield();
     }
 }

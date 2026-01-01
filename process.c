@@ -172,3 +172,43 @@ void proc_exit(void){
 
     while (1); /* never returns */
 }
+
+void proc_list(void){
+    serial_puts("PID\tState\t\tEntry\n");
+    serial_puts("---\t-----\t\t-----\n");
+    
+    for(int i = 0; i < MAX_PROCS; i++){
+        if(proctab[i].state != PR_TERMINATED){
+            serial_put_int(i);
+            serial_puts("\t");
+            
+            switch(proctab[i].state){
+                case PR_CURRENT:
+                    serial_puts("RUNNING\t\t");
+                    break;
+                case PR_READY:
+                    serial_puts("READY\t\t");
+                    break;
+                case PR_TERMINATED:
+                    serial_puts("TERMINATED\t");
+                    break;
+                default:
+                    serial_puts("UNKNOWN\t\t");
+                    break;
+            }
+            
+            serial_puts("0x");
+            // Print entry point address in hex
+            uint32_t addr = (uint32_t)proctab[i].entry;
+            char hex_str[9];
+            for(int j = 7; j >= 0; j--){
+                int digit = (addr >> (j * 4)) & 0xF;
+                hex_str[7-j] = (digit < 10) ? ('0' + digit) : ('A' + digit - 10);
+            }
+            hex_str[8] = '\0';
+            serial_puts(hex_str);
+            serial_puts("\n");
+        }
+    }
+    serial_puts("\n");
+}

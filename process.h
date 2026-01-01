@@ -30,5 +30,6 @@ void proc_run(void);
 void proc_exit(void);
 void resched(void);
 void yield(void);
+void proc_list(void);
 
 #endif
