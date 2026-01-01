@@ -8,6 +8,10 @@
 
 #define MAX_INPUT 128
 static int user_pid=1;
+void userProcess(void);
+void int_to_string(int32_t value, char *str);
+
+
 void null_process(void){
     char input[MAX_INPUT];
     int pos;
