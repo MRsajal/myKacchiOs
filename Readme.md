@@ -21,6 +21,7 @@ kacchiOS is a simple, bare-metal operating system built from scratch for educati
 ### Future Extensions (Student Assignments)
 
 Students will extend kacchiOS by implementing:
+
 - 📝 **Memory Manager**
 - 📝 **Process Manager**
 - 📝 **Scheduler**
@@ -44,7 +45,7 @@ brew install qemu i686-elf-gcc
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/kacchiOS.git
+git clone https://github.com/MRsajal/myKacchiOs.git
 cd kacchiOS
 
 # Build the OS
@@ -56,6 +57,7 @@ make run
 ```
 
 You should see:
+
 ```
 ========================================
     kacchiOS - Minimal Baremetal OS
@@ -63,7 +65,7 @@ You should see:
 Hello from kacchiOS!
 Running null process...
 
-kacchiOS> 
+kacchiOS>
 ```
 
 Type something and press Enter - it will echo back!
@@ -89,13 +91,13 @@ kacchiOS/
 
 ### Makefile Targets
 
-| Command | Description |
-|---------|-------------|
-| `make` or `make all` | Build kernel.elf |
-| `make run` | Run in QEMU (serial output only) |
-| `make run-vga` | Run in QEMU (with VGA window) |
-| `make debug` | Run in debug mode (GDB ready) |
-| `make clean` | Remove build artifacts |
+| Command              | Description                      |
+| -------------------- | -------------------------------- |
+| `make` or `make all` | Build kernel.elf                 |
+| `make run`           | Run in QEMU (serial output only) |
+| `make run-vga`       | Run in QEMU (with VGA window)    |
+| `make debug`         | Run in debug mode (GDB ready)    |
+| `make clean`         | Remove build artifacts           |
 
 ## 📚 Learning Resources
 
