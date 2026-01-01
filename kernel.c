@@ -128,13 +128,20 @@ void procB(void){
 }
 
 void userProcess(void){
-    // serial_puts("User process started.\n");
     char pid_str[12];
+    int counter = 0;
     while(1){
-        int_to_string(user_pid, pid_str);
-        serial_puts("User Process ");
-        serial_puts(pid_str);
-        serial_puts(" is running.\n");
+        counter++;
+        // Only print every 1000th iteration to reduce output overhead
+        if(counter % 1000 == 0) {
+            int_to_string(user_pid, pid_str);
+            serial_puts("User Process ");
+            serial_puts(pid_str);
+            serial_puts(" running (");
+            int_to_string(counter/1000, pid_str);
+            serial_puts(pid_str);
+            serial_puts("k)\n");
+        }
         sched_yield();
     }
 }
