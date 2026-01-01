@@ -135,6 +135,7 @@ void userProcess(void){
         serial_puts("User Process ");
         serial_puts(pid_str);
         serial_puts(" is running.\n");
+        for(volatile int i=0;i<1000000;i++); // Simple delay
         sched_yield();
     }
 }
