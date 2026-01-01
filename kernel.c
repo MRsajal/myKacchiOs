@@ -37,13 +37,38 @@ void null_process(void){
                 serial_putc(c);  /* Echo character */
             }
         }
-        
-        /* Echo back the input */
-        if (pos > 0) {
-            serial_puts("You typed: ");
+        if(strcmp(input,"help")==0){
+            serial_puts("Commands:\n");
+            serial_puts("new - create new process\n");
+            serial_puts("psa - list running processes\n");
+            serial_puts("\n");
+        }
+        else if(strcmp(input,"new")==0){
+            char pid_str[12];
+            int pid = proc_create((void(*)(void))userProcess);
+            int_to_string(pid, pid_str);
+            serial_puts("[+] New process created with PID: ");
+            serial_puts(pid_str);
+            serial_puts("\n");
+
+            sched_yield();
+        }
+        else if(strcmp(input,"psa")==0){
+            serial_puts("Current running processes:\n");
+            proc_list();
+        }
+        else if(pos>0){
+            serial_puts("Unknown command: ");
             serial_puts(input);
             serial_puts("\n");
         }
+        
+        /* Echo back the input */
+        // if (pos > 0) {
+        //     serial_puts("You typed: ");
+        //     serial_puts(input);
+        //     serial_puts("\n");
+        // }
     }
     
 }
@@ -111,27 +136,38 @@ void userProcess(void){
 void kmain(void) {
     
     
-    /* Initialize hardware */
+    // /* Initialize hardware */
+    // serial_init();
+    // mem_init();
+    // /* Print welcome message */
+    // serial_puts("\n");
+    // serial_puts("========================================\n");
+    // serial_puts("    kacchiOS - Minimal Baremetal OS\n");
+    // serial_puts("========================================\n");
+    // serial_puts("Hello from kacchiOS!\n");
+    // proc_init();
+    // proc_create(null_process);  // PID 0
+    // // proc_create(procA);         // PID 1
+    // // proc_create(procB);         // PID 2
+    // while(1){
+    //     proc_create((void(*)(void))userProcess);
+    //     user_pid++;
+    //     if(user_pid>5) {
+    //         user_pid=1;
+    //         break;
+    //     }
+    // }
+    // proc_run();
     serial_init();
     mem_init();
-    /* Print welcome message */
-    serial_puts("\n");
-    serial_puts("========================================\n");
-    serial_puts("    kacchiOS - Minimal Baremetal OS\n");
-    serial_puts("========================================\n");
+
+    serial_puts("\n===============================");
+    serial_puts("\n    kacchiOS - Minimal Baremetal OS\n");
+    serial_puts("===============================\n");
     serial_puts("Hello from kacchiOS!\n");
+
     proc_init();
-    proc_create(null_process);  // PID 0
-    // proc_create(procA);         // PID 1
-    // proc_create(procB);         // PID 2
-    while(1){
-        proc_create((void(*)(void))userProcess);
-        user_pid++;
-        if(user_pid>5) {
-            user_pid=1;
-            break;
-        }
-    }
+    proc_create(null_process);  /* PID 0 */
     proc_run();
 
     /* Should never reach here */
