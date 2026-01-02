@@ -129,17 +129,17 @@ void procB(void){
 
 void userProcess(void){
     char pid_str[12];
-    int counter = 0;
+    int pid = user_pid;
+    while (1) {
+        int_to_string(pid, pid_str);
+        serial_puts("User Process ");
+        serial_puts(pid_str);
+        serial_puts(" is running.\n");
 
-    serial_puts("[User Task Started]\n");
+        for (volatile int i = 0; i < 10000000; i++); // small delay
 
-    serial_puts("User Process PID: ");
-    int_to_string(user_pid, pid_str);
-    serial_puts(pid_str);
-    serial_puts("\n");
-    for(volatile int i=0;i<10000000;i++); // Delay loop
-    serial_puts("[User Task Finished]\n");
-    proc_exit();   // 🔥 MUST add this → removes PCB + returns to null
+        sched_yield();
+    }
 }
 
 
