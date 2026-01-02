@@ -162,7 +162,7 @@ void resched(void){
 }
 
 void yield(void){
-    if(currpid)
+    if(currpid && currpid->pid!=0)
         currpid->state=PR_READY;
     resched();
 }
@@ -179,8 +179,8 @@ void proc_exit(void){
     serial_put_int(pid);
     serial_puts("\n");
 
-    currpid = NULL;
-    current_pid = -1;
+    currpid = &proctab[pid];
+    current_pid = 0;
     resched();
 
     while (1); /* never returns */
