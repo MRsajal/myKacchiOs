@@ -21,6 +21,7 @@ typedef struct process
     uint32_t *esp;
     void *mem;
     size_t memsz;
+    int has_run;
 
 } pcb_t;
 

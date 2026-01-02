@@ -77,6 +77,7 @@ int32_t proc_create(void (*func)(void)){
     proctab[pid].esp = sp;
     proctab[pid].mem = stack;
     proctab[pid].memsz = PROC_STACK_SIZE;
+    proctab[pid].has_run=0;
 
     serial_puts("Process created with PID: ");
     serial_put_int(pid);
@@ -136,7 +137,17 @@ void resched(void){
         proctab[old].state=PR_READY;
     }
 
-    if (old < 0){
+    // if (old < 0){
+    //     asm volatile(
+    //         "movl %0, %%esp \n"
+    //         "jmp *%1       \n"
+    //         :
+    //         : "r"(proctab[next].esp),
+    //         "r"(proctab[next].entry)
+    //     );
+    // }
+    if(proctab[next].has_run==0){
+        proctab[next].has_run=1;
         asm volatile(
             "movl %0, %%esp \n"
             "jmp *%1       \n"
@@ -144,13 +155,15 @@ void resched(void){
             : "r"(proctab[next].esp),
             "r"(proctab[next].entry)
         );
+        proc_exit();
     }
 
     ctxsw(&proctab[old].esp,&proctab[next].esp);
 }
 
 void yield(void){
-    currpid->state=PR_READY;
+    if(currpid)
+        currpid->state=PR_READY;
     resched();
 }
 
