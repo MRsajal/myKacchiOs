@@ -7,8 +7,8 @@ void sched_init(void){
 }
 
 void sched_start(void){
-    proc_run();
     serial_puts("Scheduler started.\n");
+    proc_run();
 }
 
 void sched_yield(void){

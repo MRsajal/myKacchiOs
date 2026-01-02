@@ -137,36 +137,13 @@ void userProcess(void){
     serial_puts(pid_str);
     serial_puts("\n");
     for(volatile int i=0;i<10000000;i++); // Delay loop
+    proc_init();
     serial_puts("[User Task Finished]\n");
     proc_exit();   // 🔥 MUST add this → removes PCB + returns to null
 }
 
 
 void kmain(void) {
-    
-    
-    // /* Initialize hardware */
-    // serial_init();
-    // mem_init();
-    // /* Print welcome message */
-    // serial_puts("\n");
-    // serial_puts("========================================\n");
-    // serial_puts("    kacchiOS - Minimal Baremetal OS\n");
-    // serial_puts("========================================\n");
-    // serial_puts("Hello from kacchiOS!\n");
-    // proc_init();
-    // proc_create(null_process);  // PID 0
-    // // proc_create(procA);         // PID 1
-    // // proc_create(procB);         // PID 2
-    // while(1){
-    //     proc_create((void(*)(void))userProcess);
-    //     user_pid++;
-    //     if(user_pid>5) {
-    //         user_pid=1;
-    //         break;
-    //     }
-    // }
-    // proc_run();
     serial_init();
     mem_init();
 
@@ -177,7 +154,7 @@ void kmain(void) {
 
     proc_init();
     proc_create(null_process);  /* PID 0 */
-    proc_run();
+    sched_start();
 
     /* Should never reach here */
     for (;;) {

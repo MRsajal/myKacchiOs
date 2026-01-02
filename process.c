@@ -90,31 +90,6 @@ void proc_run(void){
     current_pid= -1;
     resched();
 }
-// void resched(void){
-//     int next = -1;
-//     for(int i=0;i<MAX_PROCS;i++){
-//         if(proctab[i].state == PR_READY){
-//             next = i;
-//             break;
-//         }
-//     }
-//     if(next == -1 || next == current_pid){
-//         return;
-//     }
-//     int old=current_pid;
-//     current_pid=next;
-    
-//     proctab[next].state=PR_CURRENT;
-
-//     if(old >=0 && proctab[old].state == PR_CURRENT){
-//         proctab[old].state=PR_READY;
-//     }
-//     if(old<0){
-//         asm volatile("movl %0, %%esp"::"r"(proctab[next].esp));
-//         return;
-//     }
-//     ctxsw(&proctab[old].esp,&proctab[next].esp);
-// }
 
 void resched(void){
     int next=-1;
@@ -137,15 +112,6 @@ void resched(void){
         proctab[old].state=PR_READY;
     }
 
-    // if (old < 0){
-    //     asm volatile(
-    //         "movl %0, %%esp \n"
-    //         "jmp *%1       \n"
-    //         :
-    //         : "r"(proctab[next].esp),
-    //         "r"(proctab[next].entry)
-    //     );
-    // }
     if(proctab[next].has_run==0){
         proctab[next].has_run=1;
         asm volatile(
