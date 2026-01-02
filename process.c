@@ -181,9 +181,13 @@ void proc_exit(void){
 
     currpid = &proctab[pid];
     current_pid = 0;
-    resched();
-
-    while (1); /* never returns */
+    asm volatile(
+        "movl %0, %%esp \n"
+        "jmp *%1       \n"
+        :
+        : "r"(proctab[0].esp),
+          "r"(proctab[0].entry)
+    );
 }
 
 void proc_list(void){
