@@ -100,7 +100,7 @@ void resched(void){
             break;
         }
     }
-    if(next==-1 || next==current_pid){
+    if(next==-1){
         return;
     }
     int old=current_pid;
@@ -130,6 +130,7 @@ void resched(void){
 void yield(void){
     if(currpid)
         currpid->state=PR_READY;
+        
     resched();
 }
 
