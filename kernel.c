@@ -59,9 +59,7 @@ void null_process(void){
         // }
         else if(strcmp(input,"new")==0){
             proc_create(userProcess);
-            serial_puts("New process created.\n");
             proc_create(userProcess);
-            serial_puts("New process created2.\n");
             proc_create(userProcess);
             sched_yield();
         }
