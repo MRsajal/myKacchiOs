@@ -43,6 +43,29 @@ static void serial_put_int(int32_t num) {
 /* -------------------------------------------------- */
 /* Process Manager Init                               */
 /* -------------------------------------------------- */
+void proc_run(pcb_t *proc) {
+    if (!proc) return;
+    
+    proc->state = PR_CURRENT;
+    current_pid = proc->pid;
+    currpid = proc;
+    
+    /* First dispatch (bootstrap) */
+    if (first_dispatch) {
+        first_dispatch = 0;
+        asm volatile(
+            "movl %0, %%esp \n"
+            "jmp  *%1      \n"
+            :
+            : "r"(proc->esp),
+              "r"(proc->entry)
+        );
+        while (1);
+    }
+    
+    /* This shouldn't happen in normal startup, but handle it */
+    resched();
+}
 
 void proc_init(void) {
     for (int i = 0; i < MAX_PROCS; i++) {
