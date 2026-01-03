@@ -114,6 +114,7 @@ void resched(void){
             break;
         }
     }
+    if(next==-1 || next==current_pid){
 
     // If no READY process found, run idle (PID 0)
     if (next == -1) {
@@ -151,16 +152,12 @@ void resched(void){
     // Normal context switch
     ctxsw(&proctab[old].esp, &proctab[next].esp);
 }
+}
 
 void yield(void){
-    if(currpid){
-        // Keep PID 0 always READY so the shell keeps running
-        if (currpid->pid != 0) {
-            currpid->state = PR_READY;
-        } else {
-            currpid->state = PR_READY;
-        }
-    }
+    if(currpid)
+        currpid->state=PR_READY;
+        
     resched();
 }
 
