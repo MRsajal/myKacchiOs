@@ -57,6 +57,12 @@ void null_process(void){
 
             sched_yield();
         }
+        else if(strcmp(input,"new1")==0){
+            proc_create(userProcess);
+            proc_create(userProcess);
+            proc_create(userProcess);
+            sched_yield();
+        }
         else if(strcmp(input,"psa")==0){
             serial_puts("Current running processes:\n");
             proc_list();
@@ -127,19 +133,33 @@ void procB(void){
     }
 }
 
+// void userProcess(void){
+//     char pid_str[12];
+
+//     serial_puts("[User Task Started]\n");
+
+//     serial_puts("User Process PID: ");
+//     int_to_string(user_pid, pid_str);
+//     serial_puts(pid_str);
+//     serial_puts("\n");
+//     for(volatile int i=0;i<10000000;i++); // Delay loop
+//     proc_init();
+//     serial_puts("[User Task Finished]\n");
+//     proc_exit();   // 🔥 MUST add this → removes PCB + returns to null
+// }
 void userProcess(void){
     char pid_str[12];
+    int mypid = user_pid++;
 
-    serial_puts("[User Task Started]\n");
+    while (1) {
+        serial_puts("[User Process] PID = ");
+        int_to_string(mypid, pid_str);
+        serial_puts(pid_str);
+        serial_puts(" running\n");
 
-    serial_puts("User Process PID: ");
-    int_to_string(user_pid, pid_str);
-    serial_puts(pid_str);
-    serial_puts("\n");
-    for(volatile int i=0;i<10000000;i++); // Delay loop
-    proc_init();
-    serial_puts("[User Task Finished]\n");
-    proc_exit();   // 🔥 MUST add this → removes PCB + returns to null
+        for (volatile int i = 0; i < 5000000; i++); // delay
+        sched_yield();  // 👈 GIVE CPU TO OTHERS
+    }
 }
 
 
