@@ -47,17 +47,17 @@ void null_process(void){
             serial_puts("psa - list running processes\n");
             serial_puts("\n");
         }
-        else if(strcmp(input,"new")==0){
-            char pid_str[12];
-            int pid = proc_create((void(*)(void))userProcess);
-            int_to_string(pid, pid_str);
-            serial_puts("[+] New process created with PID: ");
-            serial_puts(pid_str);
-            serial_puts("\n");
+        // else if(strcmp(input,"new")==0){
+        //     char pid_str[12];
+        //     int pid = proc_create((void(*)(void))userProcess);
+        //     int_to_string(pid, pid_str);
+        //     serial_puts("[+] New process created with PID: ");
+        //     serial_puts(pid_str);
+        //     serial_puts("\n");
 
-            sched_yield();
-        }
-        else if(strcmp(input,"new1")==0){
+        //     sched_yield();
+        // }
+        else if(strcmp(input,"new")==0){
             proc_create(userProcess);
             proc_create(userProcess);
             proc_create(userProcess);
