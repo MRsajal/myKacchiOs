@@ -154,6 +154,7 @@ void userProcess(void){
         for (volatile int i = 0; i < 5000000; i++); // delay
         sched_yield();  // 👈 GIVE CPU TO OTHERS
     }
+    proc_exit(); // 🔥 MUST add this → removes PCB + returns to null
 }
 
 
