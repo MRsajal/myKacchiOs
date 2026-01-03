@@ -73,12 +73,6 @@ void null_process(void){
             serial_puts("\n");
         }
         
-        /* Echo back the input */
-        // if (pos > 0) {
-        //     serial_puts("You typed: ");
-        //     serial_puts(input);
-        //     serial_puts("\n");
-        // }
     }
     
 }

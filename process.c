@@ -128,7 +128,7 @@ void resched(void){
 }
 
 void yield(void){
-    if(currpid && currpid->pid!=0)
+    if(currpid)
         currpid->state=PR_READY;
     resched();
 }
