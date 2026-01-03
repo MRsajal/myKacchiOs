@@ -9,6 +9,9 @@ static pcb_t proctab[MAX_PROCS];
 static int32_t current_pid = -1;
 pcb_t* currpid=NULL;
 
+// Track whether we've done the very first dispatch (bootstrapping into a process)
+static int first_dispatch = 1;
+
 extern void proc_exit(void);
 extern void ctxsw(uint32_t** old, uint32_t** new);
 
@@ -40,6 +43,7 @@ void proc_init(void){
         proctab[i].esp = NULL;
         proctab[i].mem = NULL;
         proctab[i].memsz = 0;
+        proctab[i].has_run = 0;
     }
     serial_puts("Process manager initialized.\n");
 }
@@ -92,45 +96,71 @@ void proc_run(void){
 }
 
 void resched(void){
-    int next=-1;
-    for(int i=1;i<=MAX_PROCS;i++){
-        int pid=(current_pid + i)%MAX_PROCS;
-        if(proctab[pid].state==PR_READY){
-            next=pid;
+    // Always keep PID 0 as the idle/null process fallback
+    if (proctab[0].state == PR_TERMINATED || proctab[0].pid != 0) {
+        // If PID 0 was somehow not set up, do nothing (shouldn't happen)
+        return;
+    }
+
+    int old = current_pid;
+    int next = -1;
+
+    // Round-robin: start searching from old+1
+    int start = (old < 0) ? 0 : old;
+    for (int i = 1; i <= MAX_PROCS; i++) {
+        int pid = (start + i) % MAX_PROCS;
+        if (proctab[pid].state == PR_READY) {
+            next = pid;
             break;
         }
     }
-    if(next==-1){
+
+    // If no READY process found, run idle (PID 0)
+    if (next == -1) {
+        next = 0;
+    }
+
+    // If we're already running 'next', nothing to do
+    if (next == old && old >= 0) {
         return;
     }
-    int old=current_pid;
-    current_pid=next;
-    currpid=&proctab[next];
-    proctab[next].state=PR_CURRENT;
 
-    if(old>=0 && proctab[old].state==PR_CURRENT){
-        proctab[old].state=PR_READY;
+    // Update states
+    if (old >= 0 && proctab[old].state == PR_CURRENT) {
+        proctab[old].state = PR_READY;
     }
+    proctab[next].state = PR_CURRENT;
 
-    if(proctab[next].has_run==0){
-        proctab[next].has_run=1;
+    current_pid = next;
+    currpid = &proctab[next];
+
+    // First ever dispatch: we cannot ctxsw from a non-existent context.
+    if (first_dispatch) {
+        first_dispatch = 0;
         asm volatile(
             "movl %0, %%esp \n"
-            "jmp *%1       \n"
+            "jmp  *%1      \n"
             :
             : "r"(proctab[next].esp),
-            "r"(proctab[next].entry)
+              "r"(proctab[next].entry)
         );
-        proc_exit();
+        // never returns
+        while (1) { }
     }
 
-    ctxsw(&proctab[old].esp,&proctab[next].esp);
+    // Normal context switch
+    ctxsw(&proctab[old].esp, &proctab[next].esp);
 }
 
 void yield(void){
-    if(currpid)
-        currpid->state=PR_READY;
-        
+    if(currpid){
+        // Keep PID 0 always READY so the shell keeps running
+        if (currpid->pid != 0) {
+            currpid->state = PR_READY;
+        } else {
+            currpid->state = PR_READY;
+        }
+    }
     resched();
 }
 
@@ -146,15 +176,11 @@ void proc_exit(void){
     serial_put_int(pid);
     serial_puts("\n");
 
-    currpid = &proctab[pid];
-    current_pid = 0;
-    asm volatile(
-        "movl %0, %%esp \n"
-        "jmp *%1       \n"
-        :
-        : "r"(proctab[0].esp),
-          "r"(proctab[0].entry)
-    );
+    currpid = NULL;
+    current_pid = -1;
+    resched();
+
+    while (1); /* never returns */
 }
 
 void proc_list(void){
