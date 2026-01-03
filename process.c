@@ -156,7 +156,7 @@ void resched(void) {
 /* Yield                                              */
 /* -------------------------------------------------- */
 
-void sched_yield(void) {
+void yield(void) {
     if (currpid)
         currpid->state = PR_READY;
     resched();
