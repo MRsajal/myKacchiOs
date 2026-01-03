@@ -43,29 +43,40 @@ static void serial_put_int(int32_t num) {
 /* -------------------------------------------------- */
 /* Process Manager Init                               */
 /* -------------------------------------------------- */
-void proc_run(pcb_t *proc) {
-    if (!proc) return;
+void proc_run(void) {
+    /* Find first ready process (should be PID 0 - null_process) */
+    int next = -1;
+    for (int i = 0; i < MAX_PROCS; i++) {
+        if (proctab[i].state == PR_READY) {
+            next = i;
+            break;
+        }
+    }
     
-    proc->state = PR_CURRENT;
-    current_pid = proc->pid;
-    currpid = proc;
-    
-    /* First dispatch (bootstrap) */
-    if (first_dispatch) {
-        first_dispatch = 0;
-        asm volatile(
-            "movl %0, %%esp \n"
-            "jmp  *%1      \n"
-            :
-            : "r"(proc->esp),
-              "r"(proc->entry)
-        );
+    if (next == -1) {
+        serial_puts("ERROR: No ready process to run!\n");
         while (1);
     }
     
-    /* This shouldn't happen in normal startup, but handle it */
-    resched();
+    /* Set up initial process */
+    proctab[next].state = PR_CURRENT;
+    current_pid = next;
+    currpid = &proctab[next];
+    
+    /* First dispatch (bootstrap) */
+    first_dispatch = 0;
+    asm volatile(
+        "movl %0, %%esp \n"
+        "jmp  *%1      \n"
+        :
+        : "r"(proctab[next].esp),
+          "r"(proctab[next].entry)
+    );
+    
+    /* Should never reach here */
+    while (1);
 }
+
 
 void proc_init(void) {
     for (int i = 0; i < MAX_PROCS; i++) {
