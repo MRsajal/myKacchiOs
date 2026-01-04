@@ -117,20 +117,6 @@ void procB(void){
     }
 }
 
-// void userProcess(void){
-//     char pid_str[12];
-
-//     serial_puts("[User Task Started]\n");
-
-//     serial_puts("User Process PID: ");
-//     int_to_string(user_pid, pid_str);
-//     serial_puts(pid_str);
-//     serial_puts("\n");
-//     for(volatile int i=0;i<10000000;i++); // Delay loop
-//     proc_init();
-//     serial_puts("[User Task Finished]\n");
-//     proc_exit();   // 🔥 MUST add this → removes PCB + returns to null
-// }
 void userProcess(void){
     char pid_str[12];
     int mypid = user_pid++;

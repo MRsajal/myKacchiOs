@@ -26,6 +26,8 @@ typedef struct process
     int has_run;
     int sleep_ticks;
     int wait_event;
+    int priority; //static priority for scheduling
+    int dyn_priority; //dynamic priority for scheduling
 
 } pcb_t;
 

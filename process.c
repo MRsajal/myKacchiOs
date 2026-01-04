@@ -123,6 +123,8 @@ void proc_init(void) {
         proctab[i].memsz = 0;
         proctab[i].sleep_ticks = 0;
         proctab[i].wait_event = -1;
+        proctab[i].priority = 1;
+        proctab[i].dyn_priority = 1;
     }
 
     serial_puts("Process manager initialized.\n");
@@ -162,6 +164,8 @@ int32_t proc_create(void (*func)(void)) {
     proctab[pid].esp = sp;
     proctab[pid].mem = stack;
     proctab[pid].memsz = PROC_STACK_SIZE;
+    proctab[pid].priority = 1;
+    proctab[pid].dyn_priority = 1;
 
     serial_puts("Process created with PID: ");
     serial_put_int(pid);
@@ -175,23 +179,30 @@ int32_t proc_create(void (*func)(void)) {
 /* -------------------------------------------------- */
 
 void resched(void) {
+    aging_update();
+
     int old = current_pid;
     int next = -1;
+    int best_prio = -1;
 
     int start = (old < 0) ? 0 : old;
 
     /* Round-robin search */
-    for (int i = 1; i <= MAX_PROCS; i++) {
-        int pid = (start + i) % MAX_PROCS;
-        if (proctab[pid].state == PR_READY) {
-            next = pid;
-            break;
+    for (int i = 0; i < MAX_PROCS; i++) {
+    if (proctab[i].state == PR_READY) {
+        if (proctab[i].dyn_priority > best_prio) {
+            best_prio = proctab[i].dyn_priority;
+            next = i;
         }
     }
+}
 
     /* No READY process → idle (PID 0) */
     if (next == -1)
         next = 0;
+
+    /* 🔥 RESET PRIORITY OF RUNNING PROCESS */
+    proctab[next].dyn_priority = proctab[next].priority;
 
     /* Already running */
     if (next == old && old >= 0)
@@ -270,15 +281,24 @@ void proc_list(void) {
             serial_puts("\t");
 
             switch (proctab[i].state) {
-    case PR_CURRENT: serial_puts("RUNNING"); break;
-    case PR_READY:   serial_puts("READY");   break;
-    case PR_SLEEP:   serial_puts("SLEEP");   break;
-    case PR_WAIT:    serial_puts("WAIT");    break;
-    default:         serial_puts("UNKNOWN"); break;
-}
+                case PR_CURRENT: serial_puts("RUNNING"); break;
+                case PR_READY:   serial_puts("READY");   break;
+                case PR_SLEEP:   serial_puts("SLEEP");   break;
+                case PR_WAIT:    serial_puts("WAIT");    break;
+                default:         serial_puts("UNKNOWN"); break;
+            }
 
             serial_puts("\n");
         }
     }
     serial_puts("\n");
+}
+
+
+void aging_update(void){
+    for (int i = 0; i < MAX_PROCS; i++) {
+        if (proctab[i].state == PR_READY) {
+            proctab[i].dyn_priority++;
+        }
+    }
 }
