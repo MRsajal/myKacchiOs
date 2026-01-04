@@ -157,6 +157,8 @@ int32_t proc_create(void (*func)(void)) {
     *--sp = (uint32_t)proc_exit;  // return address
     *--sp = (uint32_t)func;       // first EIP
 
+    proctab[0].priority = 0;
+    proctab[0].dyn_priority = 0;
     proctab[pid].pid = pid;
     proctab[pid].state = PR_READY;
     proctab[pid].entry = func;
@@ -296,7 +298,7 @@ void proc_list(void) {
 
 
 void aging_update(void){
-    for (int i = 0; i < MAX_PROCS; i++) {
+    for (int i = 1; i < MAX_PROCS; i++) {
         if (proctab[i].state == PR_READY) {
             proctab[i].dyn_priority++;
         }
