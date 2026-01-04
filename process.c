@@ -187,30 +187,24 @@ void resched(void) {
     int next = -1;
     int best_prio = -1;
 
-    int start = (old < 0) ? 0 : old;
-
-    /* Round-robin search */
     for (int i = 0; i < MAX_PROCS; i++) {
-    if (proctab[i].state == PR_READY) {
-        if (proctab[i].dyn_priority > best_prio) {
-            best_prio = proctab[i].dyn_priority;
-            next = i;
+        if (proctab[i].state == PR_READY) {
+            if (proctab[i].dyn_priority > best_prio) {
+                best_prio = proctab[i].dyn_priority;
+                next = i;
+            }
         }
     }
-}
 
-    /* No READY process → idle (PID 0) */
     if (next == -1)
         next = 0;
 
-    /* 🔥 RESET PRIORITY OF RUNNING PROCESS */
-    proctab[next].dyn_priority = proctab[next].priority;
-
-    /* Already running */
+    /* 🔥 DO NOT switch to the same process */
     if (next == old && old >= 0)
         return;
 
-    /* Update states */
+    proctab[next].dyn_priority = proctab[next].priority;
+
     if (old >= 0 && proctab[old].state == PR_CURRENT)
         proctab[old].state = PR_READY;
 
@@ -218,7 +212,6 @@ void resched(void) {
     current_pid = next;
     currpid = &proctab[next];
 
-    /* Switch to next process */
     asm volatile(
         "movl %0, %%esp \n"
         "ret            \n"
@@ -226,10 +219,7 @@ void resched(void) {
         : "r"(proctab[next].esp)
     );
 
-    /* never returns */
-    while (1);
-
-
+    while (1); // never reached
 }
 
 /* -------------------------------------------------- */
