@@ -101,11 +101,11 @@ void proc_run(void) {
     first_dispatch = 0;
     asm volatile(
         "movl %0, %%esp \n"
-        "jmp  *%1      \n"
+        "ret            \n"
         :
-        : "r"(proctab[next].esp),
-          "r"(proctab[next].entry)
+        : "r"(proctab[next].esp)
     );
+
     
     /* Should never reach here */
     while (1);
@@ -218,21 +218,18 @@ void resched(void) {
     current_pid = next;
     currpid = &proctab[next];
 
-    /* First dispatch (bootstrap) */
-    if (first_dispatch) {
-        first_dispatch = 0;
-        asm volatile(
-            "movl %0, %%esp \n"
-            "jmp  *%1      \n"
-            :
-            : "r"(proctab[next].esp),
-              "r"(proctab[next].entry)
-        );
-        while (1);
-    }
+    /* Switch to next process */
+    asm volatile(
+        "movl %0, %%esp \n"
+        "ret            \n"
+        :
+        : "r"(proctab[next].esp)
+    );
 
-    /* Normal context switch */
-    ctxsw(&proctab[old].esp, &proctab[next].esp);
+    /* never returns */
+    while (1);
+
+
 }
 
 /* -------------------------------------------------- */
@@ -240,8 +237,8 @@ void resched(void) {
 /* -------------------------------------------------- */
 
 void yield(void) {
-    if (currpid)
-        currpid->state = PR_READY;
+    asm volatile("movl %%esp, %0" : "=r"(currpid->esp));
+    currpid->state = PR_READY;
     resched();
 }
 
