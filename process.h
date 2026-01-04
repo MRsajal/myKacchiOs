@@ -9,7 +9,9 @@ typedef enum
 {
     PR_CURRENT,
     PR_READY,
-    PR_TERMINATED
+    PR_TERMINATED,
+    PR_SLEEP,
+    PR_WAIT
 } proc_state_t;
 
 typedef struct process
@@ -22,6 +24,8 @@ typedef struct process
     void *mem;
     size_t memsz;
     int has_run;
+    int sleep_ticks;
+    int wait_event;
 
 } pcb_t;
 
@@ -32,5 +36,6 @@ void proc_exit(void);
 void resched(void);
 void yield(void);
 void proc_list(void);
+void sleep(int ticks);
 
 #endif

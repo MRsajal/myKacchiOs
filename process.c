@@ -40,6 +40,40 @@ static void serial_put_int(int32_t num) {
     }
 }
 
+//SLEEP
+void sleep(int ticks){
+    if(ticks <=0 || currpid == NULL) return;
+    currpid->sleep_ticks = ticks;
+    currpid->state = PR_SLEEP;
+    resched();
+}
+void proc_tick(void) {
+    for (int i = 0; i < MAX_PROCS; i++) {
+        if (proctab[i].state == PR_SLEEP) {
+            proctab[i].sleep_ticks--;
+            if (proctab[i].sleep_ticks <= 0) {
+                proctab[i].state = PR_READY;
+            }
+        }
+    }
+}
+void wait(int event) {
+    currpid->wait_event = event;
+    currpid->state = PR_WAIT;
+    resched();
+}
+void wakeup(int event) {
+    for (int i = 0; i < MAX_PROCS; i++) {
+        if (proctab[i].state == PR_WAIT &&
+            proctab[i].wait_event == event) {
+
+            proctab[i].wait_event = -1;
+            proctab[i].state = PR_READY;
+        }
+    }
+}
+
+
 /* -------------------------------------------------- */
 /* Process Manager Init                               */
 /* -------------------------------------------------- */
@@ -87,6 +121,8 @@ void proc_init(void) {
         proctab[i].esp = NULL;
         proctab[i].mem = NULL;
         proctab[i].memsz = 0;
+        proctab[i].sleep_ticks = 0;
+        proctab[i].wait_event = -1;
     }
 
     serial_puts("Process manager initialized.\n");
@@ -234,10 +270,13 @@ void proc_list(void) {
             serial_puts("\t");
 
             switch (proctab[i].state) {
-                case PR_CURRENT: serial_puts("RUNNING"); break;
-                case PR_READY:   serial_puts("READY");   break;
-                default:         serial_puts("UNKNOWN"); break;
-            }
+    case PR_CURRENT: serial_puts("RUNNING"); break;
+    case PR_READY:   serial_puts("READY");   break;
+    case PR_SLEEP:   serial_puts("SLEEP");   break;
+    case PR_WAIT:    serial_puts("WAIT");    break;
+    default:         serial_puts("UNKNOWN"); break;
+}
+
             serial_puts("\n");
         }
     }
