@@ -291,3 +291,9 @@ void aging_update(void){
         }
     }
 }
+
+
+int getpid(void) {
+    if (currpid == NULL) return -1;
+    return currpid->pid;
+}

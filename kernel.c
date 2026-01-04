@@ -119,19 +119,21 @@ void procB(void){
 
 void userProcess(void){
     char pid_str[12];
-    int mypid = user_pid++;
+    int mypid = getpid();
 
-    while (1) {
+    for (int i = 0; i < 10; i++) {
         serial_puts("[User Process] PID = ");
         int_to_string(mypid, pid_str);
         serial_puts(pid_str);
         serial_puts(" running\n");
 
-        for (volatile int i = 0; i < 5000000; i++); // delay
-        sched_yield();  // 👈 GIVE CPU TO OTHERS
+        sleep(50);     // ✅ BLOCKS process properly
     }
-    proc_exit(); // 🔥 MUST add this → removes PCB + returns to null
+
+    proc_exit();       // ✅ CLEAN EXIT
 }
+
+
 
 
 void kmain(void) {

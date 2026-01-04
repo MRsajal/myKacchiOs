@@ -39,5 +39,7 @@ void resched(void);
 void yield(void);
 void proc_list(void);
 void sleep(int ticks);
+int getpid(void);
+
 
 #endif
