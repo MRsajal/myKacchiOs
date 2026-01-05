@@ -5,8 +5,8 @@
 
 #define PROC_STACK_SIZE 4096
 
-extern pcb_t proctab[MAX_PROCS];
-extern int32_t current_pid = -1;
+pcb_t proctab[MAX_PROCS];
+int32_t current_pid = -1;
 pcb_t *currpid = NULL;
 
 static int first_dispatch = 1;
