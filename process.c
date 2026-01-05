@@ -1,6 +1,7 @@
 #include "process.h"
 #include "serial.h"
 #include "memory.h"
+#include "scheduler.h"
 
 #define PROC_STACK_SIZE 4096
 
