@@ -4,5 +4,7 @@
 void sched_init(void);
 void sched_start(void);
 void sched_yield(void);
+void resched(void);
+void aging_update(void);
 
 #endif
