@@ -230,15 +230,6 @@ void proc_list(void) {
 }
 
 
-void aging_update(void){
-    for (int i = 1; i < MAX_PROCS; i++) {
-        if (proctab[i].state == PR_READY) {
-            proctab[i].dyn_priority++;
-        }
-    }
-}
-
-
 int getpid(void) {
     if (currpid == NULL) return -1;
     return currpid->pid;
