@@ -31,12 +31,20 @@ typedef struct process
 
 } pcb_t;
 
+
+extern pcb_t proctab[MAX_PROCS];
+extern int32_t current_pid;
+extern pcb_t *currpid;
+
+
 void proc_init(void);
 int32_t proc_create(void (*func)(void));
 void proc_run(void);
 void proc_exit(void);
 void proc_list(void);
 void sleep(int ticks);
+void wait(int event);
+void wakeup(int event);
 int getpid(void);
 
 
